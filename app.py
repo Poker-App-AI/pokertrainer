@@ -4,7 +4,7 @@ from poker.trainer.puzzles import PUZZLES
 from poker.trainer.engine import calculate_multi_way_equity
 from poker.trainer.llm import get_llm_explanation
 import random
-from poker_table_ui import render_poker_table
+from poker.ui.poker_table_ui import render_poker_table
 
 random.shuffle(PUZZLES)
 
@@ -38,8 +38,8 @@ for i, op in enumerate(puzzle.opponents):
     st.write(f"Opponent {i+1}: Type = {op.type}, Chips = {op.chips_remaining}")
 
 # --- Display Poker Table ---
-player_hand_cards = [puzzle["player_hand"][i:i+2] for i in range(0, len(puzzle["player_hand"]), 2)]
-board_card_list = [puzzle["board_cards"][i:i+2] for i in range(0, len(puzzle["board_cards"]), 2)] if puzzle["board_cards"] else []
+player_hand_cards = [puzzle.player_hand[i:i+2] for i in range(0, len(puzzle.player_hand), 2)]
+board_card_list = [puzzle.board_cards[i:i+2] for i in range(0, len(puzzle.board_cards), 2)] if puzzle.board_cards else []
 render_poker_table(puzzle, player_hand_cards, board_card_list)
 
 # --- Action Buttons ---

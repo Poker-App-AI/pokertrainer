@@ -19,7 +19,7 @@ def opponent_box_html(i, op, pos_style):
         f'<div style="{pos_style};text-align:center;">'
         f'<div class="opponent-label" style="margin-bottom:8px;position:relative;z-index:2;max-width:120px;">Opponent #{i+1}</div>'
         f"<div style='margin:8px 0 0 0;'>" + blank_card_html()*2 + "</div>"
-        f"<div class='info-text' style='margin-top:4px;'>(Type: {op['type']})</div>"
+        f"<div class='info-text' style='margin-top:4px;'>(Type: {op.type})</div>"
         '</div>'
     )
 
@@ -112,21 +112,21 @@ def render_poker_table(puzzle, player_hand_cards, board_card_list):
 
     # Determine opponent positions for up to 4
     opp_html = []
-    num_opps = len(puzzle['opponents'])
+    num_opps = len(puzzle.opponents)
     if num_opps == 1:
-        opp_html.append(opponent_box_html(0, puzzle['opponents'][0], "position:absolute;left:50%;top:48px;transform:translateX(-50%);") )
+        opp_html.append(opponent_box_html(0, puzzle.opponents[0], "position:absolute;left:50%;top:48px;transform:translateX(-50%);") )
     elif num_opps == 2:
-        opp_html.append(opponent_box_html(0, puzzle['opponents'][0], "position:absolute;left:22%;top:48px;") )
-        opp_html.append(opponent_box_html(1, puzzle['opponents'][1], "position:absolute;right:22%;top:48px;") )
+        opp_html.append(opponent_box_html(0, puzzle.opponents[0], "position:absolute;left:22%;top:48px;") )
+        opp_html.append(opponent_box_html(1, puzzle.opponents[1], "position:absolute;right:22%;top:48px;") )
     elif num_opps == 3:
-        opp_html.append(opponent_box_html(0, puzzle['opponents'][0], "position:absolute;left:13%;top:48px;") )
-        opp_html.append(opponent_box_html(1, puzzle['opponents'][1], "position:absolute;right:13%;top:48px;") )
-        opp_html.append(opponent_box_html(2, puzzle['opponents'][2], "position:absolute;left:4%;top:54%;transform:translateY(-50%);") )
+        opp_html.append(opponent_box_html(0, puzzle.opponents[0], "position:absolute;left:13%;top:48px;") )
+        opp_html.append(opponent_box_html(1, puzzle.opponents[1], "position:absolute;right:13%;top:48px;") )
+        opp_html.append(opponent_box_html(2, puzzle.opponents[2], "position:absolute;left:4%;top:54%;transform:translateY(-50%);") )
     elif num_opps >= 4:
-        opp_html.append(opponent_box_html(0, puzzle['opponents'][0], "position:absolute;left:13%;top:48px;") )
-        opp_html.append(opponent_box_html(1, puzzle['opponents'][1], "position:absolute;right:13%;top:48px;") )
-        opp_html.append(opponent_box_html(2, puzzle['opponents'][2], "position:absolute;left:2.5%;top:54%;transform:translateY(-50%);") )
-        opp_html.append(opponent_box_html(3, puzzle['opponents'][3], "position:absolute;right:2.5%;top:54%;transform:translateY(-50%);") )
+        opp_html.append(opponent_box_html(0, puzzle.opponents[0], "position:absolute;left:13%;top:48px;") )
+        opp_html.append(opponent_box_html(1, puzzle.opponents[1], "position:absolute;right:13%;top:48px;") )
+        opp_html.append(opponent_box_html(2, puzzle.opponents[2], "position:absolute;left:2.5%;top:54%;transform:translateY(-50%);") )
+        opp_html.append(opponent_box_html(3, puzzle.opponents[3], "position:absolute;right:2.5%;top:54%;transform:translateY(-50%);") )
     st.markdown(
         '<div class="poker-table-simple">'
         + ''.join(opp_html)
@@ -135,7 +135,7 @@ def render_poker_table(puzzle, player_hand_cards, board_card_list):
         + '<div style="display:flex;flex-direction:row;align-items:center;gap:16px;justify-content:center;width:100%;margin-bottom:8px;">'
         + '<span>' + ''.join([card_html(c) for c in board_card_list]) + '</span>'
         + '</div>'
-        + '<div class="pot-label" style="margin-top:0;">Pot: ' + str(puzzle['pot_size']) + '</div>'
+        + '<div class="pot-label" style="margin-top:0;">Pot: ' + str(puzzle.pot_size) + '</div>'
         + '</div>'
         # Player hand and label row (always below board)
         + '<div style="position:absolute;left:50%;top:66%;transform:translate(-50%,0);display:flex;flex-direction:column;align-items:center;width:100%;">'
@@ -146,11 +146,11 @@ def render_poker_table(puzzle, player_hand_cards, board_card_list):
         + '</div>'
         # Chips at the bottom
         + '<div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);text-align:center;">'
-        + '<div class="info-text" style="margin-top:2px;">(Chips: ' + str(puzzle['player_chips_remaining']) + ')</div>'
+        + '<div class="info-text" style="margin-top:2px;">(Chips: ' + str(puzzle.player_chips_remaining) + ')</div>'
         + '</div>'
         # Bet info at the very bottom
         + '<div style="position:absolute;left:50%;bottom:-32px;transform:translateX(-50%);text-align:center;font-size:1em;">'
-        + '<b>Bet to call:</b> ' + str(puzzle['bet_to_call']) + ' | <b>Your chips:</b> ' + str(puzzle['player_chips_remaining'])
+        + '<b>Bet to call:</b> ' + str(puzzle.bet_to_call) + ' | <b>Your chips:</b> ' + str(puzzle.player_chips_remaining)
         + '</div>'
         + '</div>',
         unsafe_allow_html=True
