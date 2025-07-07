@@ -1,10 +1,12 @@
 import streamlit as st
-from puzzles import puzzles
+
+from poker.trainer.puzzles import PUZZLES
+from poker.trainer.engine import calculate_multi_way_equity
+from poker.trainer.llm import get_llm_explanation
 import random
-from poker_engine import calculate_multi_way_equity
 from poker_table_ui import render_poker_table
 
-random.shuffle(puzzles)
+random.shuffle(PUZZLES)
 
 # Initialize session state
 if "puzzle_index" not in st.session_state:
@@ -15,25 +17,25 @@ if "user_action" not in st.session_state:
     st.session_state.user_action = None
 
 # Load current puzzle
-puzzle = puzzles[st.session_state.puzzle_index]
+puzzle = PUZZLES[st.session_state.puzzle_index]
 
 st.title("🃏 Poker Trainer – Puzzle Mode")
 
-st.markdown(f"### Puzzle {st.session_state.puzzle_index + 1}: {puzzle['question']}")
+st.markdown(f"### Puzzle {st.session_state.puzzle_index + 1}: {puzzle.question}")
 
 # --- Display Text Info ---
 st.markdown("#### **Your Hand:**")
-st.write(puzzle["player_hand"])
+st.write(puzzle.player_hand)
 
 st.markdown("#### **Board Cards:**")
-st.write(puzzle["board_cards"] if puzzle["board_cards"] else "No board yet (preflop)")
+st.write(puzzle.board_cards if puzzle.board_cards else "No board yet (preflop)")
 
 st.markdown("#### **Pot & Bet Info:**")
-st.write(f"Pot size: {puzzle['pot_size']} | Bet to call: {puzzle['bet_to_call']} | Your chips: {puzzle['player_chips_remaining']}")
+st.write(f"Pot size: {puzzle.pot_size} | Bet to call: {puzzle.bet_to_call} | Your chips: {puzzle.player_chips_remaining}")
 
 st.markdown("#### **Opponents:**")
-for i, op in enumerate(puzzle["opponents"]):
-    st.write(f"Opponent {i+1}: Type = {op['type']}, Chips = {op['chips_remaining']}")
+for i, op in enumerate(puzzle.opponents):
+    st.write(f"Opponent {i+1}: Type = {op.type}, Chips = {op.chips_remaining}")
 
 # --- Display Poker Table ---
 player_hand_cards = [puzzle["player_hand"][i:i+2] for i in range(0, len(puzzle["player_hand"]), 2)]
@@ -60,16 +62,16 @@ with col3:
 
 # --- Process Result ---
 if st.session_state.show_result:
-    opponent_types = [op["type"] for op in puzzle["opponents"]]
+    opponent_types = [op.type for op in puzzle.opponents]
 
     equity_result = calculate_multi_way_equity(
-        puzzle["player_hand"],
-        puzzle["board_cards"],
+        puzzle.player_hand,
+        puzzle.board_cards,
         opponent_types,
         num_simulations=5000
     )
 
-    pot_odds_percentage = (puzzle["bet_to_call"] / (puzzle["pot_size"] + puzzle["bet_to_call"])) * 100
+    pot_odds_percentage = (puzzle.bet_to_call / (puzzle.pot_size + puzzle.bet_to_call)) * 100
     player_equity = equity_result["player_win_percentage"] + equity_result["tie_percentage"] / 2
 
     if player_equity > pot_odds_percentage + 15:
@@ -91,9 +93,16 @@ if st.session_state.show_result:
     with st.expander("See Full Equity Breakdown"):
         st.json(equity_result)
 
+    # --- LLM Explanation Button ---
+    if st.button("Explain this decision (AI)"):
+        with st.spinner("Generating explanation..."):
+            explanation = get_llm_explanation(puzzle, st.session_state.user_action, correct_action, equity_result)
+        st.markdown("### 🤖 AI Explanation")
+        st.write(explanation)
+
     # --- Next Puzzle Button ---
     if st.button("Next Puzzle"):
-        st.session_state.puzzle_index = (st.session_state.puzzle_index + 1) % len(puzzles)
+        st.session_state.puzzle_index = (st.session_state.puzzle_index + 1) % len(PUZZLES)
         st.session_state.show_result = False
         st.session_state.user_action = None
 
