@@ -42,6 +42,8 @@ for player_type, hand_strings in OPPONENT_RANGES.items():
     PREPROCESSED_OPPONENT_RANGES[player_type] = all_possible_hands_for_type
 
 # --- Main equity calculation function ---
+
+
 def calculate_multi_way_equity(player_hand_str, board_cards_str="", opponent_types=[], num_simulations=1000):
     player_hand = parse_hand_string(player_hand_str)
     board_cards = parse_hand_string(board_cards_str)
@@ -53,13 +55,14 @@ def calculate_multi_way_equity(player_hand_str, board_cards_str="", opponent_typ
 
         opp_hands = []
         for op_type in opponent_types:
-            if PREPROCESSED_OPPONENT_RANGES[op_type]:
-                hand = random.choice(PREPROCESSED_OPPONENT_RANGES[op_type])
-                if hand[0] in deck.cards and hand[1] in deck.cards:
-                    opp_hands.append(hand)
-                    deck.remove_cards(hand)
-                else:
-                    opp_hands.append(deck.deal(2))
+            available_hands = [h for h in PREPROCESSED_OPPONENT_RANGES[op_type]
+                               if h[0] in deck.cards and h[1] in deck.cards]
+            if available_hands:
+                hand = random.choice(available_hands)
+                opp_hands.append(hand)
+                deck.remove_cards(hand)
+            else:
+                opp_hands.append(deck.deal(2))
 
         community = board_cards + deck.deal(5 - len(board_cards))
         player_final = player_hand + community
@@ -85,4 +88,4 @@ def calculate_multi_way_equity(player_hand_str, board_cards_str="", opponent_typ
         "player_win_percentage": player_win / total * 100,
         "tie_percentage": tie / total * 100,
         "opponent_win_percentage": opponent_win / total * 100,
-    } 
+    }
