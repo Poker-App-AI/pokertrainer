@@ -1,7 +1,7 @@
 import requests
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "llama3"  # Change to your preferred model
+OLLAMA_MODEL = "gemma3"  # Change to your preferred model
 
 def get_llm_explanation(puzzle, user_action, correct_action, equity_result):
     print(puzzle.board_cards)
@@ -18,6 +18,7 @@ def get_llm_explanation(puzzle, user_action, correct_action, equity_result):
         -- Limit your response to 100 words.
         
     Poker scenario:
+    - Puzzle Question: {puzzle.question}
     - Your hand: {puzzle.player_hand}
     - Board: {puzzle.board_cards or 'Preflop'}
     - Pot size: {puzzle.pot_size}

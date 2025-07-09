@@ -9,3 +9,5 @@
 *.pyzwz
 *.pyzwzw
 *.pyzwzwz
+*node_modules*
+*expo*

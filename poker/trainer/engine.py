@@ -89,3 +89,34 @@ def calculate_multi_way_equity(player_hand_str, board_cards_str="", opponent_typ
         "tie_percentage": tie / total * 100,
         "opponent_win_percentage": opponent_win / total * 100,
     }
+
+def simulate_showdown(player_hand_str, board_cards_str="", opponent_types=[]):
+    """
+    Simulate a single showdown: returns dict with player_hand, board, and each opponent's hand.
+    """
+    player_hand = parse_hand_string(player_hand_str)
+    board_cards = parse_hand_string(board_cards_str)
+    deck = Deck()
+    deck.remove_cards(player_hand + board_cards)
+
+    opp_hands = []
+    for op_type in opponent_types:
+        available_hands = [h for h in PREPROCESSED_OPPONENT_RANGES[op_type]
+                           if h[0] in deck.cards and h[1] in deck.cards]
+        if available_hands:
+            hand = random.choice(available_hands)
+            opp_hands.append(hand)
+            deck.remove_cards(hand)
+        else:
+            opp_hands.append(deck.deal(2))
+
+    community = board_cards + deck.deal(5 - len(board_cards))
+    # Convert Card objects to string for serialization
+    def cards_to_str(cards):
+        return ''.join(str(card) for card in cards)
+
+    return {
+        "player_hand": cards_to_str(player_hand),
+        "board": cards_to_str(community),
+        "opponents": [cards_to_str(hand) for hand in opp_hands],
+    }
