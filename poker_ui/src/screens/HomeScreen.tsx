@@ -61,6 +61,19 @@ const HomeScreen: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Poker Trainer</Text>
       <Text style={styles.subtitle}>Test your poker skills with these puzzles</Text>
+      
+      {/* Heads Up Poker Button */}
+      <TouchableOpacity
+        style={styles.headsUpButton}
+        onPress={() => {
+          // @ts-ignore
+          navigation.navigate('HeadsUp');
+        }}
+      >
+        <Text style={styles.headsUpButtonText}>Play Heads-Up Poker</Text>
+        <Text style={styles.headsUpButtonSubtext}>Challenge the AI in a 10-hand match</Text>
+      </TouchableOpacity>
+      
       <FlatList
         data={puzzles}
         renderItem={renderPuzzleItem}
@@ -178,6 +191,33 @@ const styles = StyleSheet.create({
   betSize: {
     fontSize: 12,
     color: '#cccccc',
+  },
+  headsUpButton: {
+    backgroundColor: '#4CAF50',
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  headsUpButtonText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  headsUpButtonSubtext: {
+    fontSize: 14,
+    color: '#e0e0e0',
+    textAlign: 'center',
   },
 });
 

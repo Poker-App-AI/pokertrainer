@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import HomeScreen from './src/screens/HomeScreen';
 import PuzzleScreen from './src/screens/PuzzleScreen';
+import HeadsUpScreen from './src/screens/HeadsUpScreen';
 import { PuzzleProvider } from './src/context/PuzzleContext';
 
 const Stack = createStackNavigator();
@@ -36,6 +37,11 @@ export default function App() {
               name="Puzzle" 
               component={PuzzleScreen} 
               options={{ title: 'Puzzle' }}
+            />
+            <Stack.Screen 
+              name="HeadsUp" 
+              component={HeadsUpScreen} 
+              options={{ title: 'Heads-Up Poker' }}
             />
           </Stack.Navigator>
           <StatusBar style="light" />

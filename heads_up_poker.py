@@ -81,20 +81,28 @@ class HeadsUpPoker:
         # Simple AI logic
         hand_strength = self.game_ai.get_hand_strength(self.ai_cards, self.community_cards)
         
+        # More aggressive betting - AI will bet more often
         if hand_strength > 7:
+            action = 'bet'
+            amount = min(75, self.ai_stack)  # Bigger bets for strong hands
+        elif hand_strength > 6:
             action = 'bet'
             amount = min(50, self.ai_stack)
         elif hand_strength > 5:
             if current_bet == 0:
-                action = 'check'
-                amount = 0
+                if random.random() < 0.6:  # 60% chance to bet with decent hands
+                    action = 'bet'
+                    amount = min(30, self.ai_stack)
+                else:
+                    action = 'check'
+                    amount = 0
             else:
                 action = 'call'
                 amount = current_bet
         elif hand_strength > 3:
-            if random.random() < 0.3:  # 30% chance to bluff
+            if random.random() < 0.4:  # 40% chance to bluff
                 action = 'bet'
-                amount = min(30, self.ai_stack)
+                amount = min(25, self.ai_stack)
             else:
                 if current_bet == 0:
                     action = 'check'
@@ -103,9 +111,9 @@ class HeadsUpPoker:
                     action = 'fold'
                     amount = 0
         else:
-            if random.random() < 0.1:  # 10% chance to bluff
+            if random.random() < 0.2:  # 20% chance to bluff
                 action = 'bet'
-                amount = min(20, self.ai_stack)
+                amount = min(15, self.ai_stack)
             else:
                 if current_bet == 0:
                     action = 'check'
@@ -337,14 +345,185 @@ class HeadsUpPoker:
             elif player_action['action'] == 'check':
                 print("You check")
         
-        # Deal turn and river
+        # Deal turn
         print("\n--- TURN ---")
         self.deal_community(1)
         print(f"Community cards: {self.community_cards}")
         
+        # Turn betting
+        current_bet = 0
+        if self.player_first:
+            player_action = self.get_user_action(current_bet)
+            if player_action['action'] == 'fold':
+                print("You fold. AI wins the pot!")
+                self.ai_stack += self.pot
+                self.pot = 0
+                self.player_first = not self.player_first  # Switch for next hand
+                return 'ai'
+            elif player_action['action'] == 'bet':
+                current_bet = player_action['amount']
+                self.player_stack -= player_action['amount']
+                self.pot += player_action['amount']
+                print(f"You bet ${player_action['amount']}")
+            elif player_action['action'] == 'check':
+                print("You check")
+                
+            ai_action = self.get_ai_action(current_bet)
+            if ai_action['action'] == 'fold':
+                print(f"AI folds. You win the pot!")
+                self.player_stack += self.pot
+                self.pot = 0
+                self.player_first = not self.player_first  # Switch for next hand
+                return 'player'
+            elif ai_action['action'] == 'call':
+                if current_bet > 0:
+                    self.ai_stack -= current_bet
+                    self.pot += current_bet
+                    print(f"AI calls ${current_bet}")
+                else:
+                    print("AI checks")
+            elif ai_action['action'] == 'bet':
+                self.ai_stack -= ai_action['amount']
+                self.pot += ai_action['amount']
+                current_bet = ai_action['amount']
+                print(f"AI bets ${ai_action['amount']}")
+                
+                player_action = self.get_user_action(current_bet)
+                if player_action['action'] == 'fold':
+                    print("You fold. AI wins the pot!")
+                    self.ai_stack += self.pot
+                    self.pot = 0
+                    self.player_first = not self.player_first  # Switch for next hand
+                    return 'ai'
+                elif player_action['action'] == 'call':
+                    self.player_stack -= current_bet
+                    self.pot += current_bet
+                    print(f"You call ${current_bet}")
+        else:
+            ai_action = self.get_ai_action(current_bet)
+            if ai_action['action'] == 'fold':
+                print(f"AI folds. You win the pot!")
+                self.player_stack += self.pot
+                self.pot = 0
+                self.player_first = not self.player_first  # Switch for next hand
+                return 'player'
+            elif ai_action['action'] == 'call':
+                if current_bet > 0:
+                    self.ai_stack -= current_bet
+                    self.pot += current_bet
+                    print(f"AI calls ${current_bet}")
+                else:
+                    print("AI checks")
+            elif ai_action['action'] == 'bet':
+                self.ai_stack -= ai_action['amount']
+                self.pot += ai_action['amount']
+                current_bet = ai_action['amount']
+                print(f"AI bets ${ai_action['amount']}")
+                
+            player_action = self.get_user_action(current_bet)
+            if player_action['action'] == 'fold':
+                print("You fold. AI wins the pot!")
+                self.ai_stack += self.pot
+                self.pot = 0
+                self.player_first = not self.player_first  # Switch for next hand
+                return 'ai'
+            elif player_action['action'] == 'call':
+                if current_bet > 0:
+                    self.player_stack -= current_bet
+                    self.pot += current_bet
+                    print(f"You call ${current_bet}")
+            elif player_action['action'] == 'check':
+                print("You check")
+        
+        # Deal river
         print("\n--- RIVER ---")
         self.deal_community(1)
         print(f"Community cards: {self.community_cards}")
+        
+        # River betting
+        current_bet = 0
+        if self.player_first:
+            player_action = self.get_user_action(current_bet)
+            if player_action['action'] == 'fold':
+                print("You fold. AI wins the pot!")
+                self.ai_stack += self.pot
+                self.pot = 0
+                self.player_first = not self.player_first  # Switch for next hand
+                return 'ai'
+            elif player_action['action'] == 'bet':
+                current_bet = player_action['amount']
+                self.player_stack -= player_action['amount']
+                self.pot += player_action['amount']
+                print(f"You bet ${player_action['amount']}")
+            elif player_action['action'] == 'check':
+                print("You check")
+                
+            ai_action = self.get_ai_action(current_bet)
+            if ai_action['action'] == 'fold':
+                print(f"AI folds. You win the pot!")
+                self.player_stack += self.pot
+                self.pot = 0
+                self.player_first = not self.player_first  # Switch for next hand
+                return 'player'
+            elif ai_action['action'] == 'call':
+                if current_bet > 0:
+                    self.ai_stack -= current_bet
+                    self.pot += current_bet
+                    print(f"AI calls ${current_bet}")
+                else:
+                    print("AI checks")
+            elif ai_action['action'] == 'bet':
+                self.ai_stack -= ai_action['amount']
+                self.pot += ai_action['amount']
+                current_bet = ai_action['amount']
+                print(f"AI bets ${ai_action['amount']}")
+                
+                player_action = self.get_user_action(current_bet)
+                if player_action['action'] == 'fold':
+                    print("You fold. AI wins the pot!")
+                    self.ai_stack += self.pot
+                    self.pot = 0
+                    self.player_first = not self.player_first  # Switch for next hand
+                    return 'ai'
+                elif player_action['action'] == 'call':
+                    self.player_stack -= current_bet
+                    self.pot += current_bet
+                    print(f"You call ${current_bet}")
+        else:
+            ai_action = self.get_ai_action(current_bet)
+            if ai_action['action'] == 'fold':
+                print(f"AI folds. You win the pot!")
+                self.player_stack += self.pot
+                self.pot = 0
+                self.player_first = not self.player_first  # Switch for next hand
+                return 'player'
+            elif ai_action['action'] == 'call':
+                if current_bet > 0:
+                    self.ai_stack -= current_bet
+                    self.pot += current_bet
+                    print(f"AI calls ${current_bet}")
+                else:
+                    print("AI checks")
+            elif ai_action['action'] == 'bet':
+                self.ai_stack -= ai_action['amount']
+                self.pot += ai_action['amount']
+                current_bet = ai_action['amount']
+                print(f"AI bets ${ai_action['amount']}")
+                
+            player_action = self.get_user_action(current_bet)
+            if player_action['action'] == 'fold':
+                print("You fold. AI wins the pot!")
+                self.ai_stack += self.pot
+                self.pot = 0
+                self.player_first = not self.player_first  # Switch for next hand
+                return 'ai'
+            elif player_action['action'] == 'call':
+                if current_bet > 0:
+                    self.player_stack -= current_bet
+                    self.pot += current_bet
+                    print(f"You call ${current_bet}")
+            elif player_action['action'] == 'check':
+                print("You check")
         
         # Showdown
         print("\n--- SHOWDOWN ---")
